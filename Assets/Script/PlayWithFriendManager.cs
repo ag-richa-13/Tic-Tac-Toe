@@ -4,8 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class GameManager : MonoBehaviour
+public class PlayWithFriendManager : MonoBehaviour
 {
+    public static PlayWithFriendManager Instance { get; private set; }
+
     [SerializeField] private TMP_Text Score_X, Score_O; // Score display for X and O
     [SerializeField] private Button ResetButton, ExitButton;
     [SerializeField] private Button[] CellButtons;
@@ -17,10 +19,24 @@ public class GameManager : MonoBehaviour
     private int[] boardState = new int[9]; // 0 for empty, 1 for X, 2 for O
     private int scoreX = 0, scoreO = 0; // Track scores
 
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
+
     private void Start()
     {
         ResetButton.onClick.AddListener(ResetGame);
-        ExitButton.onClick.AddListener(ExitGame);
+        ExitButton.onClick.AddListener(() =>
+        {
+            ResetGame();
+            LobbyManager.Instance.BackToLobby();
+        });
         PlayAgainButton.onClick.AddListener(PlayAgain);
         CancelButton.onClick.AddListener(ClosePopup);
 
@@ -150,10 +166,5 @@ public class GameManager : MonoBehaviour
     public void ClosePopup()
     {
         ResultPopUp.SetActive(false);
-    }
-
-    public void ExitGame()
-    {
-        Application.Quit();
     }
 }
