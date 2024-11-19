@@ -32,11 +32,7 @@ public class PlayWithFriendManager : MonoBehaviour
     private void Start()
     {
         ResetButton.onClick.AddListener(ResetGame);
-        ExitButton.onClick.AddListener(() =>
-        {
-            ResetGame();
-            LobbyManager.Instance.BackToLobby();
-        });
+        ExitButton.onClick.AddListener(() => LobbyManager.Instance.BackToLobby());
         PlayAgainButton.onClick.AddListener(PlayAgain);
         CancelButton.onClick.AddListener(ClosePopup);
 

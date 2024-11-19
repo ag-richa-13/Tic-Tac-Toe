@@ -26,7 +26,23 @@ public class LobbyManager : MonoBehaviour
         GameWithFriendPanel.SetActive(false);
         GameWithAIPanel.SetActive(false);
     }
-
+    private void Update()
+    {
+        // Detect back button press
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (LobbyPanel.activeSelf)
+            {
+                // If in lobby, close the app
+                Application.Quit();
+            }
+            else
+            {
+                // If in game, go back to the lobby
+                BackToLobby();
+            }
+        }
+    }
     public void ShowGameWithAI()
     {
         LobbyPanel.SetActive(false);
@@ -41,6 +57,8 @@ public class LobbyManager : MonoBehaviour
 
     public void BackToLobby()
     {
+        PlayWithAIManager.Instance.ResetGame();
+        PlayWithFriendManager.Instance.ResetGame();
         GameWithAIPanel.SetActive(false);
         GameWithFriendPanel.SetActive(false);
         LobbyPanel.SetActive(true);
