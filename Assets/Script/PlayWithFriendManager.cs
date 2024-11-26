@@ -44,6 +44,7 @@ public class PlayWithFriendManager : MonoBehaviour
         ResetGame();
     }
 
+
     public void onClickCellButton(Button clickedButton)
     {
         int index = System.Array.IndexOf(CellButtons, clickedButton);

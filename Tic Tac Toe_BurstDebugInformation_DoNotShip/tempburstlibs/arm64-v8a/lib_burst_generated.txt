@@ -9,6 +9,7 @@ Library: E:\GitHub\Tic-Tac-Toe\Temp\BurstOutput\tempburstlibs\arm64-v8a\lib_burs
 --target-framework=NetFramework
 --generate-link-xml=Temp\burst.link.xml
 --temp-folder=E:\GitHub\Tic-Tac-Toe\Temp\Burst
+--debug=Full
 --key-folder=C:/Program Files/Unity/Hub/Editor/2022.3.52f1/Editor/Data/PlaybackEngines/AndroidPlayer
 --decode-folder=E:\GitHub\Tic-Tac-Toe\Library\Burst
 --output=E:\GitHub\Tic-Tac-Toe\Temp\BurstOutput\tempburstlibs\arm64-v8a\lib_burst_generated
