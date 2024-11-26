@@ -111,7 +111,10 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         LobbyPanel.SetActive(false);
         PlayWithOnlineFriendPanel.SetActive(true);
+
+        PlayWithOnlineFriendManager.Instance.ResetRoomState();
     }
+
     #endregion
 
     #region Photon Callback

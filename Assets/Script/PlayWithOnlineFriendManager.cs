@@ -66,8 +66,12 @@ public class PlayWithOnlineFriendManager : MonoBehaviourPunCallbacks
         ResultPopUp.SetActive(false);
         ExitButton.onClick.AddListener(() =>
         {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                PhotonNetwork.Disconnect();
+            }
             Debug.Log("Exit button clicked. Leaving the room...");
-            PhotonNetwork.LeaveRoom();
+            // PhotonNetwork.LeaveRoom();
             LobbyManager.Instance.BackToLobby();
         });
         ResetButton.onClick.AddListener(ResetGame);
@@ -126,6 +130,27 @@ public class PlayWithOnlineFriendManager : MonoBehaviourPunCallbacks
         {
             ErrorText.text = "Please enter a valid room code!";
         }
+    }
+    public void ResetRoomState()
+    {
+        // Reset all room-related states
+        roomCode = string.Empty;
+        isPlayerTurn = false;
+
+        // Reset UI elements related to room state
+        RoomCreatePanel.SetActive(true); // Show room creation options
+        JoinRoomPanel.SetActive(false);  // Hide join room panel
+        RoomListPanel.SetActive(false);  // Hide room list panel
+
+        // StatusText.text = "Create or Join a Room"; // Reset status text
+        RoomCodeText.text = "";  // Clear room code
+        ErrorText.text = "";  // Clear any errors
+        YourName.text = "";
+        OpponentsName.text = "";
+        Status.text = "";
+
+        // Reset board state, game UI, and any previous player data
+        ResetGame();  // This method is used to reset the gameplay state (if applicable)
     }
 
     #endregion
