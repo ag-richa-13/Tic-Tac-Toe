@@ -1,7 +1,6 @@
 // #region PlayWithOnlineFriend Method
 
-// using System.Collections;
-// using System.Collections.Generic;
+
 // using UnityEngine;
 // using UnityEngine.UI;
 // using TMPro;
@@ -12,16 +11,17 @@
 // {
 //     #region Game UI
 
+//     #region  Initialization
 //     public static PlayWithOnlineFriendManager Instance { get; private set; }
 //     [Header("RoomManager")]
 //     [SerializeField] private TMP_InputField RoomNameInputField;
-//     [SerializeField] private GameObject RoomCreatePanel, JoinRoomPanel, RoomListPanel;
+//     [SerializeField] private GameObject RoomCreatePanel, JoinRoomPanel, RoomListPanel, ErrorPrompt;
 //     [SerializeField] private Button CreateButton, JoinButton, BackButton, JoinRoomButton, DoneButton;
-//     [SerializeField] private TMP_Text RoomCodeText, StatusText, ErrorText;
+//     [SerializeField] private TMP_Text RoomCodeText, StatusText, ErrorText, ErrorPromptText;
 
 //     [Header("GamePanel")]
-//     [SerializeField] private GameObject PlayWithOnlineFriendPanel;
-//     [SerializeField] private TMP_Text YourName, OpponentsName, Status;
+//     [SerializeField] private GameObject PlayWithOnlineFriendPanel, ConnectionPanel;
+//     [SerializeField] private TMP_Text YourName, OpponentsName, Status, ConnectionText;
 
 //     [Header("Assets for Game")]
 //     [SerializeField] private GameObject ResultPopUp;
@@ -34,6 +34,9 @@
 //     private int turn = 0; // 0 for Player, 1 for  2nd Player
 //     private string roomCode;
 //     private bool isPlayerTurn;
+//     private bool isReadyToCreateRoom = false;
+//     private string pendingRoomCode = null;
+//     #endregion
 
 //     private void Awake()
 //     {
@@ -51,6 +54,8 @@
 //         RoomCreatePanel.SetActive(true);
 //         JoinRoomPanel.SetActive(false);
 //         RoomListPanel.SetActive(false);
+//         ErrorPrompt.SetActive(false);
+//         ConnectionPanel.SetActive(false);
 
 //         JoinButton.onClick.AddListener(OnClickJoin);
 //         CreateButton.onClick.AddListener(CreateRoom);
@@ -66,7 +71,14 @@
 //         ResultPopUp.SetActive(false);
 //         ExitButton.onClick.AddListener(() =>
 //         {
-//             PhotonNetwork.LeaveRoom();
+//             if (PhotonNetwork.IsMasterClient)
+//             {
+//                 PhotonNetwork.Disconnect();
+//             }
+//             Debug.Log("Exit button clicked. Leaving the room...");
+//             ConnectionPanel.SetActive(true);
+//             ConnectionText.text = "Connecting to Master Server...";
+//             PhotonNetwork.ConnectUsingSettings(); // Connect to the Photon Master Server
 
 //             LobbyManager.Instance.BackToLobby();
 //         });
@@ -76,18 +88,29 @@
 //         ResetGame();
 //     }
 
-//     #region Room Create
-
+//     #region Room Create & Join
 //     public void CreateRoom()
 //     {
+//         if (!PhotonNetwork.IsConnectedAndReady)
+//         {
+//             Debug.Log("Photon not ready. Waiting for connection...");
+//             isReadyToCreateRoom = true;
+//             pendingRoomCode = Random.Range(1000, 9999).ToString();
+//             ConnectionPanel.SetActive(true);
+//             ConnectionText.text = "Connecting to Master Server...";
+//             PhotonNetwork.ConnectUsingSettings(); // Connect to Master Server
+//             return;
+//         }
+
 //         // Generate random room code
 //         roomCode = Random.Range(1000, 9999).ToString();
-//         PhotonNetwork.ConnectUsingSettings();
+
 //         // Create Photon Room
 //         RoomOptions options = new RoomOptions { MaxPlayers = 2 };
 //         PhotonNetwork.CreateRoom(roomCode, options);
 
 //         // Update UI
+//         Debug.Log($"Room Created with code: {roomCode}");
 //         RoomCodeText.text = "Room Code: " + roomCode;
 //         StatusText.text = "Waiting for a friend to join...";
 //         RoomCreatePanel.SetActive(false);
@@ -114,9 +137,19 @@
 //         RoomCreatePanel.SetActive(true);
 //         JoinRoomPanel.SetActive(false);
 //     }
+
+
 //     public void JoinRoom()
 //     {
-//         // Join room with the entered code
+//         if (!PhotonNetwork.IsConnectedAndReady)
+//         {
+//             Debug.LogError("Photon is not connected to the master server.");
+//             ConnectionPanel.SetActive(true);
+//             ConnectionText.text = "Connecting to Master Server...";
+//             PhotonNetwork.ConnectUsingSettings(); // Connect to Master Server if not connected
+//             return;
+//         }
+
 //         string enteredRoomCode = RoomNameInputField.text;
 //         if (!string.IsNullOrEmpty(enteredRoomCode))
 //         {
@@ -126,6 +159,31 @@
 //         {
 //             ErrorText.text = "Please enter a valid room code!";
 //         }
+//     }
+
+
+
+//     public void ResetRoomState()
+//     {
+//         // Reset all room-related states
+//         roomCode = string.Empty;
+//         isPlayerTurn = false;
+
+//         // Reset UI elements related to room state
+//         RoomCreatePanel.SetActive(true); // Show room creation options
+//         JoinRoomPanel.SetActive(false);  // Hide join room panel
+//         RoomListPanel.SetActive(false);  // Hide room list panel
+
+//         // StatusText.text = "Create or Join a Room"; // Reset status text
+//         RoomNameInputField.text = "";
+//         // RoomCodeText.text = "";  // Clear room code
+//         ErrorText.text = "";  // Clear any errors
+//         YourName.text = "";
+//         OpponentsName.text = "";
+//         Status.text = "";
+
+//         // Reset board state, game UI, and any previous player data
+//         ResetGame();  // This method is used to reset the gameplay state (if applicable)
 //     }
 
 //     #endregion
@@ -248,10 +306,29 @@
 //     #endregion
 //     #endregion
 //     #region Photon Callbacks
+//     public override void OnConnectedToMaster()
+//     {
+//         base.OnConnectedToMaster();
+//         Debug.Log("Connected to Master Server. Ready for matchmaking.");
+//         ConnectionPanel.SetActive(false);
+//         if (isReadyToCreateRoom && !string.IsNullOrEmpty(pendingRoomCode))
+//         {
+//             PhotonNetwork.CreateRoom(pendingRoomCode, new RoomOptions { MaxPlayers = 2 });
+//             isReadyToCreateRoom = false; // Reset flag
+//             pendingRoomCode = null; // Clear pending room code
+//         }
+//         else
+//         {
+//             // When not creating a room, just ensure connected
+//             PhotonNetwork.ConnectUsingSettings(); // Make sure we are connected to the Master Server if not yet connected
+//         }
+//     }
+
 
 //     public override void OnJoinedRoom()
 //     {
-//         base.OnJoinedRoom();
+//         base.OnJoinedLobby();
+//         Debug.Log("Successfully connected to Photon Master Server and entered the Lobby.");
 
 //         // Update UI for the joined room
 //         RoomListPanel.SetActive(true);
@@ -262,34 +339,33 @@
 
 //         if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
 //         {
-//             StatusText.text = "Both players joined! Starting the game...";
-//             Invoke(nameof(OnClickDoneButton), 2f);
-//         }
+//             Player opponentPlayer = null;
 
-//         foreach (Player player in PhotonNetwork.PlayerList)
-//         {
-//             if (player.ActorNumber != PhotonNetwork.LocalPlayer.ActorNumber)
+//             foreach (Player player in PhotonNetwork.PlayerList)
 //             {
-//                 // Set the opponent's name
-//                 OpponentsName.text = $"{player.NickName}";
-//                 Debug.Log("Opponent joined: " + player.NickName);
-//                 break;
+//                 if (player.ActorNumber != PhotonNetwork.LocalPlayer.ActorNumber)
+//                 {
+//                     // Set the opponent's name
+//                     OpponentsName.text = $"{player.NickName}";
+//                     Debug.Log("Opponent joined: " + player.NickName);
+//                     opponentPlayer = player; // Store the opponent's player object
+//                     break;
+//                 }
+//             }
+
+//             if (opponentPlayer != null)
+//             {
+//                 StatusText.text = $"You Joined {opponentPlayer.NickName}'s room!";
+//                 Invoke(nameof(OnClickDoneButton), 2f);
 //             }
 //         }
+
+
 //     }
 
 //     public override void OnPlayerEnteredRoom(Player newPlayer)
 //     {
 //         base.OnPlayerEnteredRoom(newPlayer);
-
-//         // Update status when another player joins
-//         if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
-//         {
-//             StatusText.text = "Both players joined! Starting the game...";
-//             Invoke(nameof(OnClickDoneButton), 2f);
-//         }
-
-//         // Identify opponent's name
 //         foreach (Player player in PhotonNetwork.PlayerList)
 //         {
 //             if (player.ActorNumber != PhotonNetwork.LocalPlayer.ActorNumber)
@@ -299,7 +375,14 @@
 //                 break;
 //             }
 //         }
+//         // Update status when another player joins
+//         if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
+//         {
+//             StatusText.text = $"{newPlayer.NickName} joined your room!";
+//             Invoke(nameof(OnClickDoneButton), 2f);
+//         }
 
+//         // Identify opponent's name
 //         Debug.Log("Opponent joined: " + newPlayer.NickName);
 //     }
 
@@ -307,18 +390,88 @@
 //     public override void OnCreateRoomFailed(short returnCode, string message)
 //     {
 //         base.OnCreateRoomFailed(returnCode, message);
-//         StatusText.text = "Failed to create room: " + message;
-//         RoomCreatePanel.SetActive(true);
-//         RoomListPanel.SetActive(false);
+//         ErrorPrompt.SetActive(true);
+//         ErrorPromptText.text = "Failed to create room: " + message;
+
+//         // Automatically hide the error prompt after 3 seconds
+//         Invoke(nameof(HideErrorPrompt), 3f);
 //     }
 
 //     public override void OnJoinRoomFailed(short returnCode, string message)
 //     {
 //         base.OnJoinRoomFailed(returnCode, message);
-//         StatusText.text = "Failed to join room: " + message;
-//         JoinRoomPanel.SetActive(true);
-//         RoomListPanel.SetActive(false);
+//         ErrorPrompt.SetActive(true);
+//         ErrorPromptText.text = "Failed to join room: " + message;
+
+//         // Wait before retrying or showing additional guidance to the user
+//         Invoke(nameof(HideErrorPrompt), 3f);
 //     }
+
+
+
+//     // Method to hide the error prompt
+//     private void HideErrorPrompt()
+//     {
+//         ErrorPrompt.SetActive(false);
+//     }
+
+
+
+//     public override void OnPlayerLeftRoom(Player otherPlayer)
+//     {
+//         base.OnPlayerLeftRoom(otherPlayer);
+
+//         // Notify both players that the other player left
+//         if (PhotonNetwork.IsMasterClient)
+//         {
+//             // If the player leaving is the opponent, the game will end, and the room will be closed
+//             Debug.Log($"{otherPlayer.NickName} left the room.");
+//             // Redirect to lobby if master client leaves
+//             LobbyManager.Instance.BackToLobby();
+
+//         }
+//         else
+//         {
+//             // If the current player is not the master client, just leave the room after the opponent leaves
+//             Debug.Log("Opponent left the room. You will be redirected to the lobby.");
+//             PhotonNetwork.LeaveRoom();
+//         }
+//         // ConnectionPanel.SetActive(true);
+//         // ConnectionText.text = "Connecting to Master Server...";
+//         // PhotonNetwork.ConnectUsingSettings();
+//         // Debug.Log("Connecting to Master Server..." + LobbyManager.Instance.PlayerName);
+//     }
+
+
+//     public override void OnLeftRoom()
+//     {
+//         base.OnLeftRoom();
+
+//         Debug.Log("Player has left the room.");
+
+//         // When the player leaves the room, we return to the lobby and ensure the room is deleted
+//         LobbyManager.Instance.BackToLobby(); // Assuming this method handles UI redirection to the lobby
+
+//         // Optionally, disable game UI and show a message
+//         PlayWithOnlineFriendPanel.SetActive(false);
+//         Debug.Log($"You have left the room.");
+//     }
+
+
+//     public override void OnDisconnected(DisconnectCause cause)
+//     {
+//         Debug.LogError("Disconnected from Photon: " + cause);
+
+//         // Reconnect to Master Server
+//         if (cause != DisconnectCause.DisconnectByClientLogic)
+//         {
+//             ConnectionPanel.SetActive(true);
+//             ConnectionText.text = "Connecting to Master Server...";
+//             PhotonNetwork.ConnectUsingSettings();
+//             Debug.Log("Connecting to Master Server..." + LobbyManager.Instance.PlayerName); // Reconnect if disconnected for other reasons
+//         }
+//     }
+
 
 //     #endregion
 // }

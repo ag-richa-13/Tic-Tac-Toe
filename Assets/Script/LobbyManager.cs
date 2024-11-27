@@ -15,8 +15,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     [SerializeField] private Button DoneButton;
 
     [Header("LobbyPanel")]
-    [SerializeField] private TMP_Text WelcomeText;
-    [SerializeField] private GameObject LobbyPanel, PlayWithFriendPanel, PlayWithAIPanel, PlayWithOnlineFriendPanel;
+    [SerializeField] private TMP_Text WelcomeText, ConnectionText;
+    [SerializeField] private GameObject ConnectionPanel, LobbyPanel, PlayWithFriendPanel, PlayWithAIPanel, PlayWithOnlineFriendPanel;
     [SerializeField] private Button PlayWithFriendButton, PlayWithAIButton, PlayWithOnlineFriendButton;
     private string playerName;
     public string PlayerName => playerName;
@@ -32,6 +32,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         Instance = this;
         DontDestroyOnLoad(gameObject); // Optional, keeps LobbyManager persistent
     }
+
     private void Start()
     {
         LobbyPanel.SetActive(true);
@@ -40,6 +41,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         PlayWithFriendPanel.SetActive(false);
         PlayWithOnlineFriendPanel.SetActive(false);
 
+        ConnectionPanel.SetActive(false); // Make sure the connection panel is hidden initially
         DoneButton.onClick.AddListener(OnClickDoneButton);
         PlayWithAIButton.onClick.AddListener(PlayWithAI);
         PlayWithFriendButton.onClick.AddListener(PlayWithFriend);
@@ -48,8 +50,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     private void Update()
     {
-
-        // Debug.Log("Network State: " + PhotonNetwork.NetworkClientState);
         // Detect back button press
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -64,7 +64,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                 BackToLobby();
             }
         }
-
     }
 
     public void OnClickDoneButton()
@@ -81,11 +80,15 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         }
 
         PhotonNetwork.LocalPlayer.NickName = playerName; // Set Photon Nickname
+
+        // Show the connection panel and set the text to "Connecting..."
+        ConnectionPanel.SetActive(true);
+        ConnectionText.text = "Connecting to Master Server...";
+
         PhotonNetwork.ConnectUsingSettings(); // Connect to Photon server
         UserNamePanel.SetActive(false); // Hide username panel
         WelcomeText.text = $"Welcome to lobby, {playerName}!"; // Show welcome message
     }
-
 
     public void PlayWithAI()
     {
@@ -98,6 +101,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         LobbyPanel.SetActive(false);
         PlayWithFriendPanel.SetActive(true);
     }
+
     public void BackToLobby()
     {
         PlayWithAIManager.Instance?.ResetGame();
@@ -107,12 +111,13 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         PlayWithOnlineFriendPanel.SetActive(false);
         LobbyPanel.SetActive(true);
     }
+
     public void PlayWithOnlineFriend()
     {
         LobbyPanel.SetActive(false);
         PlayWithOnlineFriendPanel.SetActive(true);
 
-        PlayWithOnlineFriendManager.Instance.ResetRoomState();
+        // PlayWithOnlineFriendManager.Instance.ResetRoomState();
     }
 
     #endregion
@@ -126,6 +131,15 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         Debug.Log(playerName + " connected to Master");
+
+        // Once connected to Master, hide the connection panel and update the message
+        ConnectionPanel.SetActive(false); // Hide connection panel
+        // LobbyPanel.SetActive(true); // Show lobby panel
+
+        // Allow the user to proceed to other actions
+        PlayWithFriendButton.interactable = true;
+        PlayWithAIButton.interactable = true;
+        PlayWithOnlineFriendButton.interactable = true;
     }
     #endregion
 }
