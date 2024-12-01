@@ -187,7 +187,7 @@ public class PlayWithOnlineFriendManager : MonoBehaviourPunCallbacks
     private IEnumerator TransitionToGameplay()
     {
 
-        yield return new WaitForSeconds(3f); // Wait for 5 seconds
+        yield return new WaitForSeconds(2f); // Wait for 5 seconds
         RoomListPanel.SetActive(false);
         SetupGame();
     }
