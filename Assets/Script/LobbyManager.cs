@@ -5,22 +5,24 @@ using UnityEngine.UI;
 using TMPro;
 using Photon.Pun;
 using System.Text.RegularExpressions;
+
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
+    #region Initialization
     public static LobbyManager Instance { get; private set; }
     [Header("UserNamePanel")]
     [SerializeField] private GameObject UserNamePanel;
     [SerializeField] private TMP_InputField NameInputField;
-    [SerializeField] private TMP_Text ErrorText;
+    [SerializeField] private TMP_Text UserNameErrorText;
     [SerializeField] private Button DoneButton;
 
     [Header("LobbyPanel")]
     [SerializeField] private TMP_Text WelcomeText, ConnectionText;
-    [SerializeField] private GameObject ConnectionPanel, LobbyPanel, PlayWithFriendPanel, PlayWithAIPanel, PlayWithOnlineFriendPanel, ErrorPrompt;
-    [SerializeField] private Button PlayWithFriendButton, PlayWithAIButton, PlayWithOnlineFriendButton;
+    [SerializeField] private GameObject ConnectionPanel, LobbyPanel, LobbyOnlineGamePlay, PlayWithFriendPanel, PlayWithAIPanel, PlayWithOnlineFriendPanel, ErrorPrompt;
+    [SerializeField] private Button PlayWithFriendButton, PlayWithAIButton, PlayOnlineButton;
     private string playerName;
     public string PlayerName => playerName;
-
+    #endregion
     #region Lobby Actions
     private void Awake()
     {
@@ -45,7 +47,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         DoneButton.onClick.AddListener(OnClickDoneButton);
         PlayWithAIButton.onClick.AddListener(PlayWithAI);
         PlayWithFriendButton.onClick.AddListener(PlayWithFriend);
-        PlayWithOnlineFriendButton.onClick.AddListener(PlayWithOnlineFriend);
+        PlayOnlineButton.onClick.AddListener(PlayWithOnlineFriend);
     }
 
     private void Update()
@@ -73,7 +75,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         // Length validation
         if (UserName.Length < 3 || UserName.Length > 8)
         {
-            ErrorText.text = "Username must be between 3 and 8 characters!";
+            UserNameErrorText.text = "Username must be between 3 and 8 characters!";
 
             return;
         }
@@ -81,7 +83,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         // Alphanumeric validation
         if (!Regex.IsMatch(UserName, @"^[a-zA-Z0-9]+$"))
         {
-            ErrorText.text = "Username must be alphanumeric (letters and numbers only)!";
+            UserNameErrorText.text = "Username must be alphanumeric (letters and numbers only)!";
 
             return;
         }
@@ -89,7 +91,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         // No spaces validation
         if (UserName.Contains(" "))
         {
-            ErrorText.text = "Username cannot contain spaces!";
+            UserNameErrorText.text = "Username cannot contain spaces!";
 
             return;
         }
@@ -97,7 +99,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         // No special characters validation
         if (UserName.IndexOfAny(new char[] { '!', '@', '#', '$', '%', '^', '&', '*' }) != -1)
         {
-            ErrorText.text = "Username cannot contain special characters!";
+            UserNameErrorText.text = "Username cannot contain special characters!";
 
             return;
         }
@@ -105,7 +107,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         // First character must be a letter
         if (!char.IsLetter(UserName[0]))
         {
-            ErrorText.text = "Username must start with a letter!";
+            UserNameErrorText.text = "Username must start with a letter!";
 
             return;
         }
@@ -116,7 +118,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
         // Show connection panel and start connection
         ConnectionPanel.SetActive(true);
-        ConnectionText.text = "Connecting to Master Server...";
+        ConnectionText.text = "Connecting to Server...";
         PhotonNetwork.ConnectUsingSettings(); // Connect to Photon server
 
         UserNamePanel.SetActive(false);
@@ -149,7 +151,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     public void PlayWithOnlineFriend()
     {
         LobbyPanel.SetActive(false);
-        PlayWithOnlineFriendPanel.SetActive(true);
+        LobbyOnlineGamePlay.SetActive(true);
 
         // PlayWithOnlineFriendManager.Instance.ResetRoomState();
     }
@@ -173,7 +175,10 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         // Allow the user to proceed to other actions
         PlayWithFriendButton.interactable = true;
         PlayWithAIButton.interactable = true;
-        PlayWithOnlineFriendButton.interactable = true;
+        PlayOnlineButton.interactable = true;
     }
     #endregion
+
 }
+
+

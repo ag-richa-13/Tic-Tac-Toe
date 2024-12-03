@@ -12,6 +12,6 @@ public class SplashScreen : MonoBehaviour
 
     void LoadNextScene()
     {
-        SceneManager.LoadScene("GameScene"); // Replace with your scene's name
+        SceneManager.LoadScene("RandomRoomScene"); // Replace with your scene's name
     }
 }

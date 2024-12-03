@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/SplashScene.unity
     guid: 16e43928bc4a83f4b851a670fe562cc3
   - enabled: 1
+    path: Assets/Scenes/RandomRoomScene.unity
+    guid: c5c502ad111ef0445828c8071df98a22
+  - enabled: 1
     path: Assets/Scenes/GameScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   m_configObjects: {}

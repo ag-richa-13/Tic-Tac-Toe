@@ -1,13 +1,5 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright company="Exit Games GmbH"/>
-// <summary>Demo code for Photon Chat in Unity.</summary>
-// <author>developer@exitgames.com</author>
-// --------------------------------------------------------------------------------------------------------------------
-
-
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-
 
 namespace Photon.Chat.Demo
 {
@@ -22,8 +14,8 @@ namespace Photon.Chat.Demo
 
         public void Start()
         {
-            this.chatNewComponent = FindObjectOfType<ChatGui>();
-
+            // Use FindFirstObjectByType instead of FindObjectOfType
+            this.chatNewComponent = Object.FindFirstObjectByType<ChatGui>();
 
             string prefsName = PlayerPrefs.GetString(UserNamePlayerPref);
             if (!string.IsNullOrEmpty(prefsName))
@@ -32,8 +24,7 @@ namespace Photon.Chat.Demo
             }
         }
 
-
-        // new UI will fire "EndEdit" event also when loosing focus. So check "enter" key and only then StartChat.
+        // new UI will fire "EndEdit" event also when losing focus. So check "enter" key and only then StartChat.
         public void EndEditOnEnter()
         {
             if (Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))
@@ -44,7 +35,8 @@ namespace Photon.Chat.Demo
 
         public void StartChat()
         {
-            ChatGui chatNewComponent = FindObjectOfType<ChatGui>();
+            // Use FindFirstObjectByType instead of FindObjectOfType
+            ChatGui chatNewComponent = Object.FindFirstObjectByType<ChatGui>();
             chatNewComponent.UserName = this.idInput.text.Trim();
             chatNewComponent.Connect();
             this.enabled = false;

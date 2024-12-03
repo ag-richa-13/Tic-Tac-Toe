@@ -102,7 +102,7 @@ public class PlayWithOnlineFriendManager : MonoBehaviourPunCallbacks
 
     private string GenerateRoomCode()
     {
-        return UnityEngine.Random.Range(1000, 9999).ToString(); // Random 4-digit code
+        return Random.Range(1000, 9999).ToString(); // Random 4-digit code
     }
 
     public void OnClickJoin()

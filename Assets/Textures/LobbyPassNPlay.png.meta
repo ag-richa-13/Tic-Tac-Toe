@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: ea27c7e49a4916046bc2b20d5d762c68
+guid: 05d578ac84708714d9a199e4bf1a43dd
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1642027165040337912
-    second: Icon_Small_0
+      213: -6704767180373676469
+    second: LobbyPassNPlay_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -139,13 +139,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Icon_Small_0
+      name: LobbyPassNPlay_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 500
-        height: 500
+        width: 438
+        height: 288
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 8f365cbb107a9c610800000000000000
-      internalID: 1642027165040337912
+      spriteID: b4e2128d5c1e3f2a0800000000000000
+      internalID: -6704767180373676469
       vertices: []
       indices: 
       edges: []
@@ -174,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Icon_Small_0: 1642027165040337912
+      LobbyPassNPlay_0: -6704767180373676469
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

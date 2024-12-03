@@ -71,3 +71,18 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+
+
+
+# Photon Unity Networking 2 (PUN2) specific files and folders
+/[Aa]ssets/Photon/PhotonLibs/
+/[Aa]ssets/Photon/PhotonRealtime/
+/[Aa]ssets/Photon/PhotonChat/
+/[Aa]ssets/Photon/PhotonUnityNetworking/
+/[Aa]ssets/Photon/PhotonUnityNetworking.Demos/
+/[Aa]ssets/Photon/PhotonUnityNetworking.Editor/
+/[Aa]ssets/Photon/Resources/PhotonServerSettings.asset
+
+# Cache files and logs related to Photon
+/[Aa]ssets/Photon/PhotonUnityNetworking/CodeGen/
